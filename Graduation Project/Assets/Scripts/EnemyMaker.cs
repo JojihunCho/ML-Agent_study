@@ -18,29 +18,6 @@ public class EnemyMaker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(ObjectSetting.level_start == false)
-		{
-            switch (ObjectSetting.level)
-			{
-                case 0:
-                    delete_child();
-                    level_0();
-                    ObjectSetting.first = false;
-                    //level = -1;
-                    break;
-                case 1:
-                    delete_child();
-                    level_1();
-                    ObjectSetting.first = false;
-                    break;
-                default:
-                    delete_child();
-                    level_2();
-                    ObjectSetting.first = false;
-                    break;
-            }
-		}
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ObjectSetting.level_start = true;
@@ -52,7 +29,35 @@ public class EnemyMaker : MonoBehaviour
         }
     }
 
-    void level_0()
+	public void reset()
+	{
+        switch (ObjectSetting.level)
+        {
+            case 0:
+                delete_child();
+                level_0();
+                ObjectSetting.first = false;
+                //level = -1;
+                break;
+            case 1:
+                delete_child();
+                level_1();
+                ObjectSetting.first = false;
+                break;
+            case 2:
+                delete_child();
+                level_2();
+                ObjectSetting.first = false;
+                break;
+            default:
+                delete_child();
+                level_3();
+                ObjectSetting.first = false;
+                break;
+        }
+    }
+
+    public void level_0()
 	{
         for(int i = 0; i < enemyInHo; i++)
 		{
@@ -62,7 +67,7 @@ public class EnemyMaker : MonoBehaviour
         }
 	}
 
-    void level_1()
+    public void level_1()
     {
         for (int i = 0; i < enemyInHo; i++)
         {
@@ -73,20 +78,33 @@ public class EnemyMaker : MonoBehaviour
         }
     }
 
-    void level_2()
+    public void level_2()
     {
-        for (int i = 0; i < enemyInHo; i++)
+        for (int i = 0; i < enemyInHo - 2; i++)
         {
-            for(int j = 0; j < enemyInVer; j++)
+            for(int j = 0; j < enemyInVer - 2; j++)
 			{
-                GameObject myInstance = Instantiate(enemy, new Vector3(-10f + i * (20f / (enemyInHo - 1)), 1f, -10f + j * (20 / (enemyInVer - 1))), Quaternion.identity) as GameObject;
+                GameObject myInstance = Instantiate(enemy, new Vector3(-10f + i * (20f / (enemyInHo - 3)), 1f, -10f + j * (20 / (enemyInVer - 3))), Quaternion.identity) as GameObject;
                 myInstance.transform.parent = parent;
             }
 
         }
     }
 
-    void delete_child()
+    public void level_3()
+    {
+        for (int i = 0; i < enemyInHo; i++)
+        {
+            float zdata = Random.Range(-10, 10);
+            bool randBool = (Random.value > 0.5f);
+            GameObject myInstance = Instantiate(enemy, new Vector3(-10f + i * (20f / (enemyInHo - 1)), 1f, 0f), Quaternion.identity) as GameObject;
+            myInstance.transform.parent = parent;
+            if(randBool) myInstance.GetComponent<EnemyMovig>().setVelocity(new Vector3(1, 0, 1));
+            else myInstance.GetComponent<EnemyMovig>().setVelocity(new Vector3(1, 0, -1));
+        }
+    }
+
+    public void delete_child()
 	{
         Transform[] allChildren = GetComponentsInChildren<Transform>();
         foreach (Transform child in allChildren)

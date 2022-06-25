@@ -6,7 +6,8 @@ public class ObjectSetting : MonoBehaviour
 {
     public GameObject player;
     public GameObject key;
-    public static bool level_start = false, first = true;
+    public GameObject enemyManager;
+    public static bool level_start = false, first = true, reset = false;
     public static int level = 0;
     public Vector3 playerPos = Vector3.zero;
     public Vector3 keyPos = Vector3.zero;
@@ -22,11 +23,14 @@ public class ObjectSetting : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(level_start == false)
+        if(level_start == false || reset)
 		{
+            reset = false;
             Remove();
             Reset();
+            GameObject.FindWithTag("GM").GetComponent<EnemyMaker>().reset();
         }
+
 
 		
 

@@ -51,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
 		{
             Debug.Log(deleted);
             Destroy(collision.gameObject);
+            ObjectSetting.reset = true;
         }
     }
 
