@@ -3,7 +3,7 @@
   "Assemblies": [
     {
       "FullName": "Unity.Burst, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "LastWriteTime": "2022-07-08T04:43:38.1296143Z"
+      "LastWriteTime": "2022-07-08T04:43:38Z"
     },
     {
       "FullName": "netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51",
@@ -19,15 +19,11 @@
     },
     {
       "FullName": "Unity.Barracuda, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "LastWriteTime": "2022-07-08T04:43:41.2291328Z"
+      "LastWriteTime": "2022-07-08T04:43:42Z"
     },
     {
       "FullName": "mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
       "LastWriteTime": "2022-02-14T23:34:34Z"
-    },
-    {
-      "FullName": "Unity.Mathematics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "LastWriteTime": "2022-07-08T04:43:39.5516113Z"
     }
   ],
   "Functions": [
@@ -64,20 +60,6 @@
         5,
         1,
         2
-      ]
-    },
-    {
-      "FullName": "System.Void Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/ExpJob>::Execute(T&,System.IntPtr,System.IntPtr,Unity.Jobs.LowLevel.Unsafe.JobRanges&,System.Int32)",
-      "ModuleOptionsHash": 8794384452606821980,
-      "ModuleHash": "a1b73faadc5848b57fdbdeeb5d6818de",
-      "LinkName": "53FE69074E5AFF26",
-      "AssemblyDependencyIndices": [
-        3,
-        4,
-        5,
-        1,
-        2,
-        6
       ]
     }
   ]

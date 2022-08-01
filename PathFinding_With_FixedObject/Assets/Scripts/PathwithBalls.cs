@@ -7,20 +7,23 @@ using System.Collections.Generic;
 
 public class PathwithBalls : Agent
 {
+    public float speed = 5.0f;
     private Transform tr;
     private Rigidbody rb;
     public Transform targetTr;
     public List<GameObject> enemy = new List<GameObject>();
-    //해당 Prefab에서는 장애물의 Kinematic으로 처리하여 외력(Agent와의 충돌)에 의해 움직이지 않음
-    public int num_ball = 0; //장애물의 개수, 유니티 에디터 - Prefab에서 조절 (권장)
+    public int num_ball = 0;
 
     public Renderer floorRd;
 
     private Material originMt;
-    public Material badMt; //장애물과 충돌 시 바닥 색
-    public Material goodMt; //타겟과 충돌 시 바닥 색
+    public Material badMt;
+    public Material goodMt;
 
-    public override void Initialize() //학습 시작 시 처음 1번 실행
+    public float time_reward = -0.1f, wall_enter = -5.0f, wall_stay = -1.0f,
+        enemy_reward = -50.0f, distance_reward = 10.0f, target_reward = 100.0f;
+
+    public override void Initialize()
     {
         tr = GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
@@ -33,7 +36,7 @@ public class PathwithBalls : Agent
         floorRd.material = originMt;
     }
 
-    public override void OnEpisodeBegin() //에피소트 시작 시 1번 씩 실행
+    public override void OnEpisodeBegin()
     {
         //물리력을 초기화
         rb.velocity = Vector3.zero;
@@ -51,12 +54,15 @@ public class PathwithBalls : Agent
             if(Random.value > 0.5f) enemy[i].GetComponent<Transform>().localPosition = new Vector3(Random.Range(-4, 4), 0.65f, Random.Range(-2, 2));
             else enemy[i].GetComponent<Transform>().localPosition = new Vector3(Random.Range(-2, 2), 0.65f, Random.Range(-4, 4));
             enemy[i].GetComponent<Transform>().rotation = Quaternion.identity;
+            float randThetha = Random.Range(0, 361) * Mathf.PI / 180;
+
+            //enemy[i].GetComponent<BallMoving>().setVelocity(new Vector3(Mathf.Sin(randThetha), 0, Mathf.Cos(randThetha)));
         }
 
         StartCoroutine(RevertMaterial());
     }
 
-    public override void CollectObservations(Unity.MLAgents.Sensors.VectorSensor sensor) //에피소드 진행 중에 계속 실행
+    public override void CollectObservations(Unity.MLAgents.Sensors.VectorSensor sensor)
     {
         sensor.AddObservation(targetTr.localPosition);  //3 (x,y,z)
         sensor.AddObservation(tr.localPosition);        //3 (x,y,z)
@@ -77,56 +83,55 @@ public class PathwithBalls : Agent
         var actionZ = 2f * Mathf.Clamp(actionBuffers.ContinuousActions[1], -1f, 1f);
 
         Vector3 dir = (Vector3.forward * actionZ) + (Vector3.right * actionX);
-        rb.velocity = (dir.normalized * 5.0f);
+        rb.velocity = (dir.normalized * speed);
 
         //지속적으로 이동을 이끌어내기 위한 마이너스 보상
-        SetReward(-0.01f);
+        SetReward(time_reward);
     }
 
 
-    public override void Heuristic(in ActionBuffers actionsOut) //유저 input을 위한 디버그용 함수
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
         var continuousActionsOut = actionsOut.ContinuousActions;
         continuousActionsOut[0] = Input.GetAxis("Horizontal");
         continuousActionsOut[1] = Input.GetAxis("Vertical");
     }
 
-    void OnCollisionEnter(Collision coll) //물체(Rigid body)와 충돌 시 1번 실행
+    void OnCollisionEnter(Collision coll)
     {
         if (coll.collider.CompareTag("ball"))
         {
             floorRd.material = badMt;
             //잘못된 행동일 때 마이너스 보상을 준다.
             
-            SetReward(-5.0f);
-            StartCoroutine(RevertMaterial());
+            SetReward(enemy_reward);
+            float distence = Vector3.Magnitude(targetTr.localPosition - tr.localPosition);
+            if (distence > 0.5f) SetReward(distance_reward / (2 * distence));
+            else SetReward(distance_reward);
+
+            EndEpisode();
         }
 
         if (coll.collider.CompareTag("wall"))
         {
-            SetReward(-1.0f);
+            SetReward(wall_enter);
         }
 
         if (coll.collider.CompareTag("target"))
         {
             floorRd.material = goodMt;
             //올바른 행동일 때 플러스 보상을 준다.
-            SetReward(+50.0f);
+            SetReward(target_reward);
             //학습을 종료시키는 메소드
             EndEpisode();
         }
     }
 
-    void OnCollisionStay(Collision coll) //물체(Rigid body)와 충돌 지속 시 계속 실행
+    void OnCollisionStay(Collision coll)
     {
         if (coll.collider.CompareTag("wall"))
         {
-            SetReward(-1.0f);
-        }
-
-        if (coll.collider.CompareTag("ball"))
-        {
-            SetReward(-5.0f);
+            SetReward(wall_stay);
         }
     }
 }
